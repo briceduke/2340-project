@@ -40,6 +40,7 @@ game_loop:
 	syscall
 	
 	li, $v0, 1
+	lw $a0, last_move
 	syscall
 	
 	li $v0, 11

@@ -9,11 +9,11 @@ last_move:  	.word 0
 computer_move:
 	# $t0 = game_board address
 	# $t1 = last_move value
-
+	
 	# Generate random move
-	li $v0, 42				# bounded random integer
+	li $v0, 42			# bounded random integer
 	li $a0, 0
-	li $a1, 9				# upper bound is not inclusive
+	li $a1, 9			# upper bound is not inclusive
 	syscall
 
 	addi $a0, $a0, 1		# move number from 0-8 to 1-9
@@ -23,9 +23,9 @@ computer_move:
 	sw $a0, last_move		# store last move
 
 	# Load for updating
-	la $t3, board_numbers	# $t3 = board_numbers address
+	la $t3, board_numbers		# $t3 = board_numbers address
 	move $t4, $t0			# $t4 = copy of game_board address, mutate this but not $t0
-	li $t5, 36				# $t5 = counter
+	li $t5, 36			# $t5 = counter
 
 loop:
 	lw $t6, 0($t3)			# $t6 = value of current board_numbers address
@@ -34,20 +34,20 @@ loop:
 	addi $t4, $t4, 4		# increment game_board copy address
 	addi $t5, $t5, -1		# decrement counter
 	bnez $t5, loop
-	j return				# if there are no valid moves found, just return
+	j return			# if there are no valid moves found, just return
 
 update:
 	lw $t7, 0($t4)			# $t7 = value of current game_board copy address
-	bnez $t7, computer_move # if $t7 is not zero, it's occupied so regenerate the move
+	bnez $t7, computer_move		# if $t7 is not zero, it's occupied so regenerate the move
 
-	li $t7, 2				# $t7 = value of computer move
+	li $t7, 2			# $t7 = value of computer move
 	sw $t7, 0($t4)			# set game_board copy to 2
 
 
 ####################################################
-#						   						   #
+#						   #
 #  Below is a temporary board display, ignore it!  #
-#						   						   #
+#						   #
 ####################################################
 
 
