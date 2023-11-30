@@ -1,5 +1,4 @@
 .data
-#game_board: .space  144  	# 6 rows x 6 columns x 4 bytes
 game_board: 	.word 0, 0, 0, 0, 0, 0,
 	    	.word 0, 0, 0, 0, 0, 0,
             	.word 0, 0, 0, 0, 0, 0,
@@ -24,15 +23,8 @@ occupied_msg: 	.asciiz "Space is occupied, try again.\n"
 main:
 	# Initialize game board
     	la $t0, game_board
-    	#li $t1, 36		# counter
-    	#li $t2, 0
 
 init_loop: 
-	#sw $t2, 0($t0)		# set to zero
-	#addi $t0, $t0, 4    	# move to next element
-	#addi $t1, $t1, -1   	# decrement counter
-	#bnez $t1, init_loop
-
 	# Generate first move
     	li $v0, 42		# bounded random integer
 	li $a0, 0
@@ -67,7 +59,7 @@ loop:
 	lw $t6, 0($t3)			# $t6 = value of current board_numbers address
 	beq  $t6, $t2, update
 	addi $t3, $t3, 4		# increment board_numbers address
-	addi $t0, $t0, 4		# increment game_board copy address
+	addi $t0, $t0, 4		# increment game_board address
 	addi $t5, $t5, -1		# decrement counter
 	bnez $t5, loop
 
@@ -76,28 +68,19 @@ update:
 	bnez $t7, invalid_input		# if $t7 is not zero, it's occupied so regenerate the move
 
 	li $t7, 1			# $t7 = value of player move
-	sw $t7, 0($t0)			# set game_board copy to 1
+	sw $t7, 0($t0)			# set game_board to 1
 	
 	sw $a0, last_move
 	
 	# Validate game state
 	
 	# Update UI
-	li $v0, 4
-	la $a0, prev_prompt
-	syscall
-	
-	li, $v0, 1
-	lw $a0, last_move
-	syscall
-	
-	li $v0, 11
-	li $a0, '\n'
-	syscall
+	jal print_last_move
 	
 	# Computer move
 	lw $t1, last_move
 	la $t0, game_board
+
 	jal computer_move
 	
 	sw $t1, last_move
