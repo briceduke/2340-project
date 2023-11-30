@@ -5,11 +5,11 @@ last_move:  	.word 0
 
 .text
 .globl computer_move
-
+	
 computer_move:
 	# $t0 = game_board address
 	# $t1 = last_move value
-	
+
 	# Generate random move
 	li $v0, 42			# bounded random integer
 	li $a0, 0
@@ -43,7 +43,6 @@ update:
 	li $t7, 2			# $t7 = value of computer move
 	sw $t7, 0($t4)			# set game_board copy to 2
 
-
 ####################################################
 #						   #
 #  Below is a temporary board display, ignore it!  #
@@ -65,7 +64,7 @@ print_loop:
 
 	li $a0, ' '
 	li $v0, 11
-	syscall 
+	syscall
 
 	addi $t1, $t1, 4
 	addi $t2, $t2, -1
@@ -82,7 +81,7 @@ print_loop:
 return:
     	# Set last move and board address back to original registers
     	lw $t1, last_move
-    	move $t0, $t4
+
 
     	# Return to game loop
 	jr $ra

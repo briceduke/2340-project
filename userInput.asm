@@ -12,7 +12,7 @@ prompt: .asciiz "Enter a number (1-9): "
 error_msg: .asciiz "Invalid input. Enter a number between 1 and 9.\n"
 
 .text
-.globl main
+.globl get_user_input, input_error
 
 main:
     # Display the board
@@ -31,7 +31,7 @@ display_board:
     li $t1, 6                      # Total number of rows is 6
 
 display_rows:
-    beq $t0, $t1, end_display      
+    beq $t0, $t1, end_display
     li $t3, 0                      # Initialize column counter to 0
     li $t4, 6                      # Total number of columns is 6
 
@@ -78,13 +78,10 @@ get_user_input:
     syscall
 
     # Store the input value in $t0
-    move $t0, $v0
+    move $t2, $v0
 
-   
-    blt $t0, 1, input_error       # If input is less than 1, jump to input_error
-    bgt $t0, 9, input_error       # If input is greater than 9, jump to input_error
-
-
+    blt $t2, 1, input_error       # If input is less than 1, jump to input_error
+    bgt $t2, 9, input_error       # If input is greater than 9, jump to input_error
 
     jr $ra                         # Return from get_user_input
 
