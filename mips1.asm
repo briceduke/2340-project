@@ -1,8 +1,8 @@
 .data
 matrix: .word 1, 1, 1, 0, 0, 0
-        .word 1, 2, 2, 2, 2, 0
+        .word 1, 2, 2, 2, 0, 0
         .word 1, 0, 0, 0, 0, 0
-        .word 0, 1, 1, 1, 1, 0
+        .word 1, 0, 1, 1, 0, 0
         .word 0, 0, 0, 0, 0, 0
         .word 0, 0, 0, 0, 0, 0
 result_msg: .asciiz "Neither 1's nor 2's in a row.\n"
@@ -70,8 +70,8 @@ check_consecutive:
 
         next_column:
             beqz $t6, consecutive_not_found
-            sll $t5, $t2, 2    # Calculate the offset (4 * consecutive counter)
-            add $t0, $t0, $t5  # Move to the next column
+	    #sll $t5, $t2, 2    # Calculate the offset (4 * consecutive counter)
+            addi $t0, $t0, 4  # Move to the next column
             add $t6, $t6, -1
             j col_loop
 
