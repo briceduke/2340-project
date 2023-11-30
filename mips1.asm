@@ -1,8 +1,8 @@
 .data
-matrix: .word 1, 1, 1, 1, 0, 0
+matrix: .word 1, 1, 1, 0, 0, 0
         .word 1, 2, 2, 2, 2, 0
         .word 1, 0, 0, 0, 0, 0
-        .word 1, 0, 0, 0, 0, 0
+        .word 0, 1, 1, 1, 1, 0
         .word 0, 0, 0, 0, 0, 0
         .word 0, 0, 0, 0, 0, 0
 result_msg: .asciiz "Neither 1's nor 2's in a row.\n"
@@ -48,6 +48,7 @@ check_consecutive:
 
     li $t2, 0   # Counter for consecutive elements
     li $t3, 4   # Number of consecutive elements to check
+    li $t6, 36
 
     # Loop through each row
     row_loop:
@@ -68,12 +69,57 @@ check_consecutive:
             li $t2, 0   # Reset consecutive counter
 
         next_column:
+            beqz $t6, consecutive_not_found
             sll $t5, $t2, 2    # Calculate the offset (4 * consecutive counter)
             add $t0, $t0, $t5  # Move to the next column
-            j end_check
+            add $t6, $t6, -1
+            j col_loop
 
         consecutive_found:
             li $v0, 1
+            j end_check
+
+       	consecutive_not_found:
+       		li $t7, -1
+
+    column_loop:
+    	la $t0, matrix
+        li $t2, 0   # Reset consecutive counter
+	li $t6, 6
+	
+	beq $t7, 6, c_not_found
+	
+	addi $t7, $t7, 1
+	
+	sll $t8, $t7, 2
+	
+	add $t0, $t0, $t8
+	
+        # Loop through each column
+        r_loop:
+            lw $t4, 0($t0)   # Load matrix element
+            beq $t4, $t1, i_counter
+            j r_counter
+
+        i_counter:
+            addi $t2, $t2, 1   # Increment consecutive counter
+            bge $t2, $t3, c_found   # Check if 4 consecutive elements found
+            j next_row
+
+        r_counter:
+            li $t2, 0   # Reset consecutive counter
+
+        next_row:
+            beqz $t6, column_loop
+            addi $t0, $t0, 24  # Move to the next row
+            add $t6, $t6, -1
+            j r_loop
+
+        c_found:
+            li $v0, 1
+            j end_check
+
+       	c_not_found:
             j end_check
 
     end_check:
