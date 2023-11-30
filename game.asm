@@ -1,25 +1,37 @@
 .data
-game_board: .space  144  	# 6 rows x 6 columns x 4 bytes
-board_numbers:  .word   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 24, 25, 27, 28, 30, 32, 35, 36, 40, 42, 45, 48, 49, 54, 56, 63, 64, 72, 81
+#game_board: .space  144  	# 6 rows x 6 columns x 4 bytes
+game_board: 	.word 0, 0, 0, 0, 0, 0,
+	    	.word 0, 0, 0, 0, 0, 0,
+            	.word 0, 0, 0, 0, 0, 0,
+            	.word 0, 0, 0, 0, 0, 0,
+            	.word 0, 0, 0, 0, 0, 0,
+            	.word 0, 0, 0, 0, 0, 0
 
-last_move: .word   0
-last_move_display: .asciiz "\nLast Move: "
-occupied_msg: .asciiz "Space is occupied, try again.\n"
+board_numbers:  .word   1, 2, 3, 4, 5, 6,
+		.word 	7, 8, 9, 10, 12, 14,
+		.word 	15, 16, 18, 20, 21, 24,
+		.word 	25, 27, 28, 30, 32, 35,
+		.word 	36, 40, 42, 45, 48, 49,
+		.word 	54, 56, 63, 64, 72, 81
+
+last_move: 	.word   0
+prev_prompt: 	.asciiz "\nLast Move: "
+occupied_msg: 	.asciiz "Space is occupied, try again.\n"
 
 .text
 .globl main
-	
+
 main:
 	# Initialize game board
     	la $t0, game_board
-    	li $t1, 36		# counter
-    	li $t2, 0
+    	#li $t1, 36		# counter
+    	#li $t2, 0
 
 init_loop: 
-	sw $t2, 0($t0)		# set to zero
-	addi $t0, $t0, 4    	# move to next element
-	addi $t1, $t1, -1   	# decrement counter
-	bnez $t1, init_loop
+	#sw $t2, 0($t0)		# set to zero
+	#addi $t0, $t0, 4    	# move to next element
+	#addi $t1, $t1, -1   	# decrement counter
+	#bnez $t1, init_loop
 
 	# Generate first move
     	li $v0, 42		# bounded random integer
@@ -72,7 +84,7 @@ update:
 	
 	# Update UI
 	li $v0, 4
-	la $a0, last_move_display
+	la $a0, prev_prompt
 	syscall
 	
 	li, $v0, 1
@@ -88,12 +100,9 @@ update:
 	la $t0, game_board
 	jal computer_move
 	
-	# Validate game state
-
 	sw $t1, last_move
-	li, $v0, 1
-	lw $a0, last_move
-	syscall
+	
+	# Validate game state
 	
 	# Update UI
 	
@@ -106,7 +115,7 @@ exit:
 print_last_move:
 	# Print last move
 	li $v0, 4
-	la $a0, last_move_display
+	la $a0, prev_prompt
 	syscall
 	
 	li, $v0, 1
