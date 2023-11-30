@@ -11,24 +11,6 @@ twos_msg: .asciiz "4 consecutive 2's in a row or column.\n"
 
 .text
 .globl check_consecutive, found_ones, found_twos, result_msg
-#main:
-
-
-    # Check for 4 consecutive 1's
-  #  li $t1, 1
-  #  jal check_consecutive
-  #  beq $v0, 1, found_ones
-
-    # Check for 4 consecutive 2's
-   # li $t1, 2
-  #  jal check_consecutive
- #   beq $v0, 1, found_twos
-
-    # No consecutive 1's or 2's found
- #   li $v0, 4
-  #  la $a0, result_msg
-  #  syscall
-  #  j end_program
 
 found_ones:
     li $v0, 4
