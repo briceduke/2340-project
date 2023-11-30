@@ -1,79 +1,84 @@
 .data
-array:      .word 1, 1, 1, 1, 0, 0,
-            .word 2, 2, 2, 2, 0, 0,
-            .word 0, 0, 0, 0, 0, 0,
-            .word 0, 0, 0, 0, 0, 0,
-            .word 0, 0, 0, 0, 0, 0,
-            .word 0, 0, 0, 0, 0, 0
-
-newline:    .asciiz "\n"
-result1:    .asciiz "4 consecutive 1's in a row or column\n"
-result2:    .asciiz "4 consecutive 2's in a row or column\n"
-result3:    .asciiz "Neither 1's nor 2's in a row or column\n"
+matrix: .word 1, 1, 1, 1, 0, 0
+        .word 1, 2, 2, 2, 2, 0
+        .word 1, 0, 0, 0, 0, 0
+        .word 1, 0, 0, 0, 0, 0
+        .word 0, 0, 0, 0, 0, 0
+        .word 0, 0, 0, 0, 0, 0
+result_msg: .asciiz "Neither 1's nor 2's in a row.\n"
+ones_msg: .asciiz "4 consecutive 1's in a row or column.\n"
+twos_msg: .asciiz "4 consecutive 2's in a row or column.\n"
 
 .text
 main:
-    la $t0, array         # Load the base address of the array
-    li $t1, 6             # Number of rows
-    li $t2, 6             # Number of columns
+    la $t0, matrix
 
-    # Check rows
-    jal check_rows
+    # Check for 4 consecutive 1's
+    li $t1, 1
+    jal check_consecutive
+    beq $v0, 1, found_ones
 
-    # Check columns
-    #jal check_columns
+    # Check for 4 consecutive 2's
+    li $t1, 2
+    jal check_consecutive
+    beq $v0, 1, found_twos
 
-    # Print the result
-    li $v0, 4              # Print string syscall code
-    la $a0, result3         # Load the result string address
+    # No consecutive 1's or 2's found
+    li $v0, 4
+    la $a0, result_msg
     syscall
+    j end_program
 
-    # Exit program
-    li $v0, 10             # Exit syscall code
+found_ones:
+    li $v0, 4
+    la $a0, ones_msg
     syscall
+    j end_program
 
-check_rows:
-    li $t3, 0              # Counter for consecutive occurrences
-    li $t4, 4              # Number of consecutive occurrences needed
-row_loop:
-    beq $t3, $t4, row_found  # If 4 consecutive occurrences found, branch to row_found
-    li $t5, 0              # Reset column index to 0 for each row
-column_loop:
-    lw $t6, 0($t0)         # Load element at the current position
-    beq $t6, 1, increment1  # If the element is 1, branch to increment1
-    beq $t6, 2, reset1      # If the element is 2, branch to reset1
-    j reset2               # Otherwise, branch to reset2
-
-increment1:
-    addi $t3, $t3, 1       # Increment consecutive occurrences counter for 1
-    j next_column          # Jump to next column
-
-reset1:
-    li $t3, 0              # Reset consecutive occurrences counter for 1
-    j next_column          # Jump to next column
-
-reset2:
-    li $t3, 0              # Reset consecutive occurrences counter for 2
-
-next_column:
-    addi $t0, $t0, 4       # Move to the next column
-    addi $t5, $t5, 1       # Increment column index
-    bne $t5, $t2, column_loop  # If not at the end of the row, repeat the loop
-
-    # If reached here, move to the next row
-    addi $t1, $t1, -1      # Decrement row index
-    beq $t1, $zero, no_row_found  # If at the end of the array, branch to no_row_found
-    j row_loop             # Repeat the loop for the next row
-
-row_found:
-    li $v0, 4              # Print string syscall code
-    la $a0, result1        # Load the result1 string address
+found_twos:
+    li $v0, 4
+    la $a0, twos_msg
     syscall
-    j end_check_rows
+    j end_program
 
-no_row_found:
-    j end_check_rows
+check_consecutive:
+    # $t0: base address of the matrix
+    # $t1: value to check for (1 or 2)
+    # Return: $v0 = 1 if consecutive elements found, 0 otherwise
 
-end_check_rows:
-    jr $ra                 # Return from the function
+    li $t2, 0   # Counter for consecutive elements
+    li $t3, 4   # Number of consecutive elements to check
 
+    # Loop through each row
+    row_loop:
+        li $t2, 0   # Reset consecutive counter
+
+        # Loop through each column
+        col_loop:
+            lw $t4, 0($t0)   # Load matrix element
+            beq $t4, $t1, inc_counter
+            j reset_counter
+
+        inc_counter:
+            addi $t2, $t2, 1   # Increment consecutive counter
+            bge $t2, $t3, consecutive_found   # Check if 4 consecutive elements found
+            j next_column
+
+        reset_counter:
+            li $t2, 0   # Reset consecutive counter
+
+        next_column:
+            sll $t5, $t2, 2    # Calculate the offset (4 * consecutive counter)
+            add $t0, $t0, $t5  # Move to the next column
+            j end_check
+
+        consecutive_found:
+            li $v0, 1
+            j end_check
+
+    end_check:
+        jr $ra
+
+end_program:
+    li $v0, 10   # Exit program
+    syscall
