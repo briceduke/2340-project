@@ -10,41 +10,46 @@ ones_msg: .asciiz "4 consecutive 1's in a row or column.\n"
 twos_msg: .asciiz "4 consecutive 2's in a row or column.\n"
 
 .text
-main:
-    la $t0, matrix
+.globl check_consecutive, found_ones, found_twos, result_msg
+#main:
+
 
     # Check for 4 consecutive 1's
-    li $t1, 1
-    jal check_consecutive
-    beq $v0, 1, found_ones
+  #  li $t1, 1
+  #  jal check_consecutive
+  #  beq $v0, 1, found_ones
 
     # Check for 4 consecutive 2's
-    li $t1, 2
-    jal check_consecutive
-    beq $v0, 1, found_twos
+   # li $t1, 2
+  #  jal check_consecutive
+ #   beq $v0, 1, found_twos
 
     # No consecutive 1's or 2's found
-    li $v0, 4
-    la $a0, result_msg
-    syscall
-    j end_program
+ #   li $v0, 4
+  #  la $a0, result_msg
+  #  syscall
+  #  j end_program
 
 found_ones:
     li $v0, 4
     la $a0, ones_msg
     syscall
+    jal win_sound
     j end_program
 
 found_twos:
     li $v0, 4
     la $a0, twos_msg
     syscall
+    jal loss_sound
     j end_program
 
 check_consecutive:
     # $t0: base address of the matrix
     # $t1: value to check for (1 or 2)
     # Return: $v0 = 1 if consecutive elements found, 0 otherwise
+    
+    la $t9, ($t0)
 
     li $t2, 0   # Counter for consecutive elements
     li $t3, 4   # Number of consecutive elements to check
@@ -83,7 +88,7 @@ check_consecutive:
        		li $t7, -1
 
     column_loop:
-    	la $t0, matrix
+    	la $t0, ($t9)
         li $t2, 0   # Reset consecutive counter
 	li $t6, 6
 	

@@ -15,11 +15,13 @@ volume: .byte 100
 # $a2 = instrument (0-127)
 # $a3 = volume (0-127)
 
-#####################################################################
-# Initially load the duration, volume, instrument, and first note,  #
-# then add to the note to get other notes and shift the duration to #
-# create longer/shorter notes.                                      #
-#####################################################################
+#########################################################################
+#									#
+#   Initially load the duration, volume, instrument, and first note,    #
+#   then add to the note to get other notes and shift the duration to   #
+#   create longer/shorter notes.                                        #
+#									#
+#########################################################################
 
 win_sound:
 	li $v0, 33

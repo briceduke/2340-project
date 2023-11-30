@@ -6,14 +6,15 @@ game_board: 	.word 0, 0, 0, 0, 0, 0,
             	.word 0, 0, 0, 0, 0, 0,
             	.word 0, 0, 0, 0, 0, 0
 
-board_numbers:  .word   1, 2, 3, 4, 5, 6,
-		.word 	7, 8, 9, 10, 12, 14,
-		.word 	15, 16, 18, 20, 21, 24,
-		.word 	25, 27, 28, 30, 32, 35,
-		.word 	36, 40, 42, 45, 48, 49,
-		.word 	54, 56, 63, 64, 72, 81
+board_numbers:  .word 1, 2, 3, 4, 5, 6,
+		.word 7, 8, 9, 10, 12, 14,
+		.word 15, 16, 18, 20, 21, 24,
+		.word 25, 27, 28, 30, 32, 35,
+		.word 36, 40, 42, 45, 48, 49,
+		.word 54, 56, 63, 64, 72, 81
 
-last_move: 	.word   0
+last_move: 	.word 0
+
 prev_prompt: 	.asciiz "\nLast Move: "
 occupied_msg: 	.asciiz "Space is occupied, try again.\n"
 
@@ -42,11 +43,11 @@ user_input:
 
 	# Player input
 	jal get_user_input
-	
+
 	# Load last move and game board
 	la $t0, game_board
 	lw $t1, last_move
-	
+
 	add $a0, $t2, $zero
 
 	mul $t2, $a0, $t1		# $t2 = product of inputted number and last move
@@ -65,7 +66,7 @@ loop:
 
 update:
 	lw $t7, 0($t0)			# $t7 = value of current game_board copy address
-	bnez $t7, invalid_input		# if $t7 is not zero, it's occupied so regenerate the move
+	bnez $t7, invalid_input		# if $t7 is not zero, it's occupied so pick another number
 
 	li $t7, 1			# $t7 = value of player move
 	sw $t7, 0($t0)			# set game_board to 1
@@ -73,7 +74,12 @@ update:
 	sw $a0, last_move
 	
 	# Validate game state
-	
+	# Check for 4 consecutive 1's
+	li $t1, 1
+    	la $t0, game_board
+    	jal check_consecutive
+    	beq $v0, 1, found_ones
+
 	# Update UI
 	jal print_last_move
 	
@@ -82,11 +88,17 @@ update:
 	la $t0, game_board
 
 	jal computer_move
-	
+
 	sw $t1, last_move
 	
 	# Validate game state
 	
+	# Check for 4 consecutive 2's
+    	li $t1, 2
+    	la $t0, game_board
+    	jal check_consecutive
+	beq $v0, 1, found_twos
+    
 	# Update UI
 	
 	j game_loop
@@ -100,7 +112,7 @@ print_last_move:
 	li $v0, 4
 	la $a0, prev_prompt
 	syscall
-	
+
 	li, $v0, 1
 	lw $a0, last_move
 	syscall
