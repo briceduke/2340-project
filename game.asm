@@ -81,6 +81,8 @@ update:
     	beq $s0, 1, found_ones
 
 	# Update UI
+	jal display_board
+
 	jal print_last_move
 	
 	# Computer move
@@ -101,6 +103,8 @@ update:
     
 	# Update UI
 	
+	jal display_board
+	la $t0, game_board
 	j game_loop
 	
 exit:
