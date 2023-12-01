@@ -78,7 +78,7 @@ update:
 	li $t1, 1
     	la $t0, game_board
     	jal check_consecutive
-    	beq $v0, 1, found_ones
+    	beq $s0, 1, found_ones
 
 	# Update UI
 	jal print_last_move
@@ -97,7 +97,7 @@ update:
     	li $t1, 2
     	la $t0, game_board
     	jal check_consecutive
-	beq $v0, 1, found_twos
+	beq $s0, 1, found_twos
     
 	# Update UI
 	

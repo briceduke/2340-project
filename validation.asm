@@ -63,7 +63,7 @@ check_consecutive:
             j col_loop
 
         consecutive_found:
-            li $v0, 1
+            li $s0, 1
             j end_check
 
        	consecutive_not_found:
@@ -103,7 +103,7 @@ check_consecutive:
             j r_loop
 
         c_found:
-            li $v0, 1
+            li $s0, 1
             j end_check
 
        	c_not_found:
