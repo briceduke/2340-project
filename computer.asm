@@ -7,6 +7,8 @@ board_numbers:  .word   1, 2, 3, 4, 5, 6,
 		.word 	54, 56, 63, 64, 72, 81
 new_line:   	.asciiz "\n"
 last_move:  	.word 0
+x:		.asciiz "P"
+o:		.asciiz "C"
 
 .text
 .globl computer_move
@@ -56,22 +58,43 @@ update:
 
 
 display_board:
+	la $t5, board_numbers
     	move $t1, $t0
     	li $t2, 36
     	li $t3, 6
 
 
 print_loop:
+	
 	lw $t4, 0($t1)
-	move $a0, $t4
+	lw $t6, 0($t5)
+	bne $t4, $zero, print_played
+	j print_num
+print_played:
+	li $t7, 1
+	beq $t4, $t7, print_one
+	j print_two
+print_one:
+	la $a0, x
+	li $v0, 4
+	syscall
+	j finish_print
+print_two:
+	la $a0, o
+	li $v0, 4
+	syscall
+	j finish_print
+print_num:
+	move $a0, $t6
 	li $v0, 1
 	syscall
-
+finish_print:
 	li $a0, ' '
 	li $v0, 11
 	syscall
 
 	addi $t1, $t1, 4
+	addi $t5, $t5, 4
 	addi $t2, $t2, -1
 	addi $t3, $t3, -1
 	bnez $t3, print_loop
